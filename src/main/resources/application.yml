@@ -1,0 +1,50 @@
+server.port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, mappings, loggers, prometheus
+
+#springdoc:
+#  api-docs:
+#    enabled: true
+#    path: /v3/api-docs
+#  swagger-ui:
+#    enabled: true
+#    path: /swagger-ui.html
+
+spring:
+  application.name: MovieDb
+  data:
+    mongodb:
+      uri: mongodb://movie_usr:test123@localhost:27017/movie_db
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+
+adapter:
+  client:
+    omdb:
+      url: http://www.omdbapi.com/
+      # should be provided
+      api-key: e4f33820
+movie-catalog:
+  movies:
+    - movieId: "1"
+      imdbId: "tt0111161"
+    - movieId: "2"
+      imdbId: "tt0068646"
+    - movieId: "3"
+      imdbId: "tt0071562"
+
+logging:
+  level:
+    root: DEBUG
