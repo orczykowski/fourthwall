@@ -17,7 +17,7 @@ class MongoRatingRepositoryFacade(private val repository: MongoRatingRepository)
     override fun store(rating: RatingDetails) {
         repository.save(
             RatingDocument(
-                id = UUID.randomUUID(),
+                id = null,
                 movieId = rating.movieId.value,
                 rating = rating.rate.value,
                 user = rating.userName,
@@ -27,24 +27,25 @@ class MongoRatingRepositoryFacade(private val repository: MongoRatingRepository)
     }
 
     override fun findAllByMovieId(movieId: MovieId) =
-        repository.findByMovieId(movieId.value).map {
-            RatingDetails(
-                movieId = MovieId(it.movieId),
-                rate = UserRateValue(it.rating),
-                userName = it.user,
-                createdAt = it.createdAt
-            )
-        }
+        repository.findByMovieId(movieId.value)
+            .map {
+                RatingDetails(
+                    movieId = MovieId(it.movieId),
+                    rate = UserRateValue(it.rating),
+                    userName = it.user,
+                    createdAt = it.createdAt
+                )
+            }
 }
 
 interface MongoRatingRepository : MongoRepository<RatingDocument, UUID> {
     fun findByMovieId(movieId: String): List<RatingDocument>
 }
 
-@Document(collation = "ratings")
+@Document("ratings")
 data class RatingDocument(
     @Id
-    val id: UUID,
+    val id: UUID?,
     @Indexed
     val movieId: String,
     val rating: Int,

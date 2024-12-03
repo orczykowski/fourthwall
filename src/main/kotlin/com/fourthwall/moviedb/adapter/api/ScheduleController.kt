@@ -3,6 +3,7 @@ package com.fourthwall.moviedb.adapter.api
 import com.fourthwall.moviedb.domain.movie.MovieId
 import com.fourthwall.moviedb.domain.schedule.*
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.time.DayOfWeek
@@ -10,7 +11,7 @@ import java.time.Instant
 
 @RestController
 @RequestMapping(
-    headers = ["X-Api-Version=${ApiVersion.V1}", "Accept=application/json"]
+    headers = ["X-Api-Version=${ApiVersion.V1}", "Content-Type=application/json"]
 )
 class ScheduleController(
     private val scheduleInfoProvider: ScheduleProvider,
@@ -22,6 +23,7 @@ class ScheduleController(
             .let { return DailyMoviesSchedulesResponse.from(it) }
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/api/internal/movies/{movieId}/schedules/{dayOfWeek}")
     fun updateSchedule(
         @PathVariable("movieId") movieId: String,
@@ -36,7 +38,8 @@ class ScheduleController(
         scheduleManager.upsertSchedule(command)
     }
 
-    @PatchMapping("/api/internal/movies/{movieId}/schedules/{dayOfWeek}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/api/internal/movies/{movieId}/schedules/{dayOfWeek}")
     fun addMovieProjectionToSchedule(
         @PathVariable("movieId") movieId: String,
         @PathVariable("dayOfWeek") dayOfWeek: DayOfWeek,
@@ -51,6 +54,23 @@ class ScheduleController(
         scheduleManager.addProjection(command)
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PatchMapping("/api/internal/movies/{movieId}/schedules/{dayOfWeek}")
+    fun updateMovieProjection(
+        @PathVariable("movieId") movieId: String,
+        @PathVariable("dayOfWeek") dayOfWeek: DayOfWeek,
+        @RequestBody scheduleJsonDto: AddProjectionRequest,
+    ) {
+        val command = UpdatePriceCommand(
+            MovieId(movieId),
+            dayOfWeek,
+            scheduleJsonDto.startAt,
+            Money(scheduleJsonDto.price, scheduleJsonDto.currency)
+        )
+        scheduleManager.updateProjection(command)
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/api/internal/movies/{movieId}/schedules/{dayOfWeek}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun removeAllSchedule(

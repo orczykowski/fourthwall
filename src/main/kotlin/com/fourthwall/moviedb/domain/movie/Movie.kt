@@ -1,5 +1,6 @@
 package com.fourthwall.moviedb.domain.movie
 
+import com.fourthwall.moviedb.domain.movie.rating.ExternalRating
 import java.time.Duration
 import kotlin.time.toKotlinDuration
 
@@ -19,13 +20,19 @@ data class Movie(
         category = details.category.value,
     )
 
-    fun updateRating(userRating: Double) = Movie(
+    fun updateUserRating(userRating: Double) = Movie(
         id = id,
         details = details,
         rating = rating.copy(userRating = userRating)
     )
 
     fun durationInSeconds() = details.duration.toKotlinDuration().inWholeSeconds
+    fun updateImdb(externalRating: ExternalRating) = Movie(
+        id = id,
+        details = details,
+        rating = rating.copy(imdb = externalRating.value)
+    )
+
 }
 
 data class MovieSnapshot(
@@ -45,7 +52,27 @@ data class Details(
     val category: Category,
 )
 
-data class Title(val value: String)
-data class Description(val value: String)
-data class Category(val value: String)
-data class MovieRatings(val imdb: String, val userRating: Double)
+data class Title(val value: String) {
+    init {
+        require(value.isNotBlank()) { "Title cannot be blank" }
+    }
+}
+
+data class Description(val value: String) {
+    init {
+        require(value.isNotBlank()) { "Description cannot be blank" }
+    }
+}
+
+data class Category(val value: String) {
+    init {
+        require(value.isNotBlank()) { "Category cannot be blank" }
+    }
+}
+
+data class MovieRatings(val imdb: String, val userRating: Double) {
+    init {
+        require(imdb.isNotBlank()) { "Imdb rating cannot be blank" }
+        require(userRating in 0.0..5.0) { "User rating must be between 0 and 5" }
+    }
+}

@@ -11,13 +11,19 @@ import java.time.Instant
 class ScheduleService(
     private val scheduleRepository: ScheduleRepository,
     private val movieRepository: MovieRepository,
-): ScheduleManager {
+) : ScheduleManager {
 
     override fun addProjection(command: AddProjectionCommand) = scheduleRepository.findByMovieId(command.movieId)
         ?.addSingleMovieProjection(command.dayOfWeek, command.startAt, getMovie(command.movieId), command.price)
         ?.let { scheduleRepository.save(it.toSnapshot()) }
         ?: throw MovieScheduleNotFoundException(command.movieId)
 
+    override fun updateProjection(command: UpdatePriceCommand) {
+        scheduleRepository.findByMovieId(command.movieId)
+            ?.updateProjectionPrice(command.dayOfWeek, command.startAt, command.price)
+            ?.let { scheduleRepository.save(it.toSnapshot()) }
+            ?: throw MovieScheduleNotFoundException(command.movieId)
+    }
 
     override fun upsertSchedule(command: UpsertScheduleCommand) {
         val movie = getMovie(command.movieId)

@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(
-    path = ["/api/public/movies/{id}/ratings"], headers = ["X-Api-Version=${ApiVersion.V1}", "Accept=application/json"]
+    path = ["/api/public/movies/{id}/ratings"],
+    headers = ["X-Api-Version=${ApiVersion.V1}",
+        "Content-Type=application/json"]
 )
 class RatingController(
     private val evaluator: MovieEvaluator,
@@ -26,7 +28,7 @@ class RatingController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun rateMovie(@PathVariable("id") id: String, @RequestBody body: RateMovieRequest) =
-        evaluator.rateMovie(RateMovieCommand(MovieId(id), UserRateValue(body.rate), body.userName))
+        evaluator.rateMovie(RateMovieCommand(MovieId(id), UserRateValue.of(body.rate), body.userName))
 
     data class RatingsDto(
         val imdb: String,

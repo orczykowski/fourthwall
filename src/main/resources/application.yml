@@ -5,16 +5,21 @@ management:
       exposure:
         include: health, info, metrics, mappings, loggers, prometheus
 
-#springdoc:
-#  api-docs:
-#    enabled: true
-#    path: /v3/api-docs
-#  swagger-ui:
-#    enabled: true
-#    path: /swagger-ui.html
+springdoc:
+  api-docs:
+    enabled: true
+    path: docs/v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: docs/swagger-ui.html
 
+domain:
+  update-movie-info:
+    fixed-rate: 120
 spring:
   application.name: MovieDb
+  aop:
+    proxy-target-class: true
   data:
     mongodb:
       uri: mongodb://movie_usr:test123@localhost:27017/movie_db
@@ -36,15 +41,16 @@ adapter:
       url: http://www.omdbapi.com/
       # should be provided
       api-key: e4f33820
-movie-catalog:
-  movies:
-    - movieId: "1"
-      imdbId: "tt0111161"
-    - movieId: "2"
-      imdbId: "tt0068646"
-    - movieId: "3"
-      imdbId: "tt0071562"
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
+
+dummy:
+  users:
+    - username: admin
+      password: admin1
+    - username: user
+      password: test123
+    - username: user2
+      password: qwe123

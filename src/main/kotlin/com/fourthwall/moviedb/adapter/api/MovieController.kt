@@ -9,7 +9,7 @@ import java.time.Duration
     path = ["/api/public/movies"],
     headers = [
         "X-Api-Version=${ApiVersion.V1}",
-        "Accept=application/json"]
+        "Content-Type=application/json"]
 )
 class MovieController(private val movieProvider: MovieProvider) {
 
@@ -17,13 +17,12 @@ class MovieController(private val movieProvider: MovieProvider) {
     fun findMovies(@RequestParam(required = false) category: String?): MoviesDto {
         val movies = movieProvider
             .findMovies(MoviesQuery(category?.toCategory()))
-            .map { SimpleMovieDto(it.movieId.value, it.title.value) }
+            .map { SimpleMovieDto(it.id, it.title) }
         return MoviesDto(movies)
     }
 
     @GetMapping("/{id}")
     fun getMovie(@PathVariable("id") id: String) = MovieDto.from(movieProvider.getMovieById(MovieId(id)))
-
 
     data class MoviesDto(
         val movies: List<SimpleMovieDto>,

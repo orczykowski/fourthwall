@@ -29,6 +29,18 @@ data class MovieSchedule(val movieId: MovieId, val schedules: Map<DayOfWeek, Lis
         return MovieSchedule(movieId, schedules + (dayOfWeek to (dailySchedule + movieProjection)))
     }
 
+    fun updateProjectionPrice(dayOfWeek: DayOfWeek, startAt: Instant, price: Money): MovieSchedule {
+        val dailySchedule = schedules[dayOfWeek] ?: throw MovieScheduleNotFoundException(movieId)
+        val updatedDailySchedule = dailySchedule.map {
+            if (it.startAt == startAt) {
+                it.copy(price = price)
+            } else {
+                it
+            }
+        }
+        return MovieSchedule(movieId, schedules + (dayOfWeek to updatedDailySchedule))
+    }
+
     private fun validate(movieProjections: List<MovieProjection>) {
         movieProjections.forEach { isValidMovieTimeInSchedule(movieProjections, it) }
     }

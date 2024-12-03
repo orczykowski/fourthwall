@@ -1,7 +1,7 @@
 package com.fourthwall.moviedb.domain.movie
 
 interface MovieProvider {
-    fun findMovies(criteria: MoviesQuery): List<SimpleMovie>
+    fun findMovies(criteria: MoviesQuery): List<MovieSnapshot>
     fun getMovieById(id: MovieId): MovieSnapshot
 }
 
@@ -10,6 +10,4 @@ data class MoviesQuery(val category: Category? = null) {
         return category == null
     }
 }
-
-data class SimpleMovie(val movieId: MovieId, val title: Title)
 
